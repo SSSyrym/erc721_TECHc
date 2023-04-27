@@ -1,0 +1,56 @@
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.19;
+
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
+contract SYRYMNFT is ERC721URIStorage, Ownable  {
+    uint256 _tokenId;
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenidCounter; 
+    uint _users;
+
+    constructor() ERC721("SYRYMNFT", "SRM" ) {}
+
+    function _baseURI() internal pure override returns (string memory) {
+        return "gateway.pinata.cloud/ipfs/QmSd6Rbz81PgsFZU9gvgSSssE2X4MZNmVkLg6KMN6wPepj?_gl=1*4eq0d9*rs_ga*OWRkYzc0MmEtNmM2MC00YWZhLTkwOGEtMGE4MzZlZWFkMGVj*rs_ga_5RMPXG14TE*MTY4MjYxMjIzNy40LjEuMTY4MjYxMjU5OS42MC4wLjA.";
+
+    }
+
+    function mint(address _to, uint256 _tokenId, string calldata _uri) external onlyOwner {
+        _mint(_to, _tokenId);
+        _setTokenURI(_tokenId, _uri);
+    }
+
+    function safeMint(address to) public onlyOwner {
+        uint256 tokenID = _tokenidCounter.current();
+        _tokenidCounter.increment();
+        _safeMint(to, _tokenId);
+
+    }
+
+
+    function listItem(uint256 tokenId, uint256 price) public {
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
+        require(price > 0, "Price must be greater than zero");
+        // TODO: add functionality to list item for sale
+    }
+
+    function buyItem(uint256 tokenId) public payable {
+        require(_exists(tokenId), "ERC721: non-existent token");
+        // TODO: add functionality to buy item
+    }
+
+    function cancel(uint256 tokenId) public {
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
+        // TODO: add functionality to cancel sale of item
+    }
+
+    function createItem(address to) external {
+    uint256 tokenId = _tokenidCounter.current();
+    require(tokenId <= _users, "There is no extra data to mint");
+    _tokenidCounter.increment();
+    _safeMint(to, tokenId);
+    }
+}
